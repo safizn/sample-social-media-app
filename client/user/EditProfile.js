@@ -62,6 +62,7 @@ class EditProfile extends Component {
     const jwt = auth.isAuthenticated()
     const user = {
       name: this.state.name || undefined, 
+      about: this.state.about || undefined,
       email: this.state.email || undefined,
       password: this.state.password || undefined, 
     }
@@ -83,6 +84,16 @@ class EditProfile extends Component {
             Edit Profile
           </Typography>
           <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal"/><br/>
+          <TextField
+            id="multiline-flexible"
+            label="About"
+            multiline
+            rows="2"
+            value={this.state.about}
+            onChange={this.handleChange('about')}
+            className={classes.textField}
+            margin="normal"
+          /><br/>
           <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal"/><br/>
           <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal"/>
           <br/> {
