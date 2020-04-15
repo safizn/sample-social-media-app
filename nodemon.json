@@ -1,0 +1,7 @@
+{
+    "verbose": true,
+    "watch": [
+      "./server"
+    ],
+    "exec": "npm run transpile-server && npm run run-server"
+}
