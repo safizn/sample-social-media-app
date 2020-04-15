@@ -8,6 +8,5 @@ Features:
 - Posting messages with media.
 - News feed with posts from followed users.
 - Listing posts by user. 
-- Linking posts. 
-- Commenting on posts.
+- Liking & Commenting on posts.
 
