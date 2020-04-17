@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Redirect, useParams } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
 import { Card, CardActions, CardContent, Icon, Button, TextField, Typography } from '@material-ui/core'
+import { PhotoCamera } from '@material-ui/icons'
 import { create } from './api-user.js'
 import { update, read } from "./api-user.js";
 import auth from "../auth/auth-helper.js";
@@ -39,9 +40,11 @@ const EditProfile = (props) => {
   const [user, setUser] = useState({
       name: '',
       about: '',
+      photo: '',
       email: '',
       password: '',
   })
+  const [formData] = useState(new FormData())
   
   const [redirect, setRedirect] = useState({ 
       redirectToProfile: false,
@@ -57,18 +60,26 @@ const EditProfile = (props) => {
       })
   }, [])
   
-  const handleChange = name => event => setUser({ ...user, [name]: event.target.value })
-
+  const handleChange = name => event => {
+    let value; 
+    value = (name == 'photo') ? event.target.files[0] : event.target.value
+    formData.set(name, value)
+    // new Response(formData).text().then(console.log) // debug form data.
+    setUser({ ...user, [name]: value })
+  }
 
   const clickSubmit = () => {
     const jwt = auth.isAuthenticated()
-    const _user = {
-      name: user.name || undefined, 
-      about: user.about || undefined,
-      email: user.email || undefined,
-      password: user.password || undefined, 
-    }
-    update({ userId: params.userId }, { t: jwt.token }, _user)
+
+    // used previously when sent a json instead.
+    // const _user = {
+    //   name: user.name || undefined, 
+    //   about: user.about || undefined,
+    //   email: user.email || undefined,
+    //   password: user.password || undefined, 
+    // }
+
+    update({ userId: params.userId }, { t: jwt.token }, formData)
       .then(data => {
         if(data.error) setRedirect({ ...redirect, error: data.error })
         else setRedirect({ ...redirect, userId: data._id, redirectToProfile: true })
@@ -85,7 +96,14 @@ const EditProfile = (props) => {
           Edit Profile
         </Typography>
         <TextField id="name" label="Name" className={classes.textField} value={user.name} onChange={handleChange('name')} margin="normal"/><br/>
-        <TextField id="multiline-flexible" label="about" multiline rows="2" className={classes.textField} value={user.about} onChange={handleChange('about')} margin="normal"/><br/>
+        <TextField id="multiline-flexible" label="about" multiline rows="2" className={classes.textField} value={user.about} onChange={handleChange('about')} margin="normal"/>
+        <br/>
+        <input accept="image/*" type="file" id="icon-button-file" style={{display: 'none'}} onChange={handleChange('photo')} />
+        <label htmlFor="icon-button-file"><Button variant="contained" color="default" component="span">
+          Upload <PhotoCamera/>
+        </Button></label>
+        <span className={classes.filename}>{user.photo ? user.photo.name : ''}</span> 
+        <br/>
         <TextField id="email" type="email" label="Email" className={classes.textField} value={user.email} onChange={handleChange('email')} margin="normal"/><br/>
         <TextField id="password" type="password" label="Password" className={classes.textField} value={user.password} onChange={handleChange('password')} margin="normal"/>
         <br/> {

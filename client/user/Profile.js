@@ -37,6 +37,10 @@ const Profile = (props) => {
 
   useEffect(() => init(userId), [userId])
 
+  const photoUrl = user._id ? 
+    `/api/users/photo/${user._id}?${new Date().getTime()}` : 
+    `/api/users/defaultphoto`
+
   const {classes} = props 
   if(redirectToSignin) return <Redirect to='/signin' />
   return (
@@ -47,9 +51,7 @@ const Profile = (props) => {
       <List dense>
         <ListItem>
           <ListItemAvatar>
-            <Avatar>
-              <Person/>
-            </Avatar>
+            <Avatar src={photoUrl} className={classes.bigAvatar}/>
           </ListItemAvatar>
           <ListItemText primary={user.name} secondary={user.email}/> {
             auth.isAuthenticated().user && auth.isAuthenticated().user._id == user._id && 

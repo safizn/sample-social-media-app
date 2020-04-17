@@ -32,10 +32,10 @@ export const update = (params, credentials, user) => fetch(`/api/users/${params.
     method: 'PUT', 
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/json', // removed to allow accepting non json 'multipart/form-data'
       'Authorization': 'Bearer ' + credentials.t
     },
-    body: JSON.stringify(user)
+    body: user
   })
   .then(response => response.json())
   .catch(err => console.log(err))

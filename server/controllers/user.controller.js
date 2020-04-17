@@ -1,3 +1,5 @@
+import fs from 'fs'
+import formidable from 'formidable'
 import User from '../models/user.model.js'
 import errorHandler from '../helpers/dbErrorHandler.js'
 
@@ -35,16 +37,26 @@ export const read = (req, res) => {
 }
 
 export const update = (req, res, next) => {
-  let user = req.profile
-  user = Object.assign(user, req.body)
-  user.updated = Date.now()
-  user.save()
-    .then(user => {
-      user.hashed_password = undefined
-      user.salt = undefined
-      res.json(user)
-    })
-    .catch(err => res.status(400).json({ error: errorHandler.getErrorMessage(err) }))
+  let form = formidable({ keepExtensions: true })
+  form.parse(req, (err, fields, files) => {
+    if(err) return res.status(400).json({ error: "Photo could not be uploaded"})
+
+    let user = req.profile
+    user = Object.assign(user, fields)
+    user.updated = Date.now()
+    if(files.photo) {
+      user.photo.data = fs.readFileSync(files.photo.path, { encoding: null /*i.e. Buffer*/})
+      user.photo.contentType = files.photo.type
+    }
+    user.save()
+      .then(user => {
+        user.hashed_password = undefined
+        user.salt = undefined
+        res.json(user)
+      })
+      .catch(err => res.status(400).json({ error: errorHandler.getErrorMessage(err) }))
+  })
+
 }
 
 export const remove = (req, res, next) => {
@@ -56,4 +68,17 @@ export const remove = (req, res, next) => {
       res.json(deletedUser)
     })
     .catch(err => res.status(400).json({ error: errorHandler.getErrorMessage(err) }))
+}
+
+export const photo = (req, res, next) => {
+  if(req.profile.photo.data) {
+    res.set("Content-Type", req.profile.photo.contentType)
+    return res.send(req.profile.photo.data)
+  }
+  next()
+}
+
+import profileImage from '../../client/assets/images/profile-pic.png'
+export const defaultPhoto = (req, res) => {
+  return res.sendFile(process.cwd() + profileImage /** e.g. "/dist/<hash>.png" */)
 }
