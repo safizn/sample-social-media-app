@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
-import { Card, CardActions, CardContent, Icon, Button, TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
+import { Card, CardActions, CardContent, Icon, Button, TextField, Typography } from '@material-ui/core'
 import { create } from './api-user.js'
 import { update, read } from "./api-user.js";
 import auth from "../auth/auth-helper.js";
@@ -33,82 +33,73 @@ const styles = theme => ({
   }
 })
 
-class EditProfile extends Component {
-  constructor({match}) {
-    super()
-    this.state = {
+const EditProfile = (props) => {  
+  const params = useParams()
+
+  const [user, setUser] = useState({
       name: '',
+      about: '',
       email: '',
       password: '',
+  })
+  
+  const [redirect, setRedirect] = useState({ 
       redirectToProfile: false,
       error: '',
-      // userId
-    }
-    this.match = match
-  }
+  })
 
-  handleChange = name => event => this.setState({ [name]: event.target.value })
-
-  componentDidMount = () => {
+  useEffect(() => {
     const jwt = auth.isAuthenticated()
-    read({ userId: this.match.params.userId }, { t: jwt.token })
+    read({ userId: params.userId }, { t: jwt.token })
       .then((data) => {
-        if (data.error) this.setState({error: data.error})
-        else this.setState({ name: data.name, email: data.email })
+        if (data.error) setRedirect({...redirect, error: data.error})
+        else setUser({ ...user, name: data.name, email: data.email })
       })
-  }
+  }, [])
+  
+  const handleChange = name => event => setUser({ ...user, [name]: event.target.value })
 
-  clickSubmit = () => {
+
+  const clickSubmit = () => {
     const jwt = auth.isAuthenticated()
-    const user = {
-      name: this.state.name || undefined, 
-      about: this.state.about || undefined,
-      email: this.state.email || undefined,
-      password: this.state.password || undefined, 
+    const _user = {
+      name: user.name || undefined, 
+      about: user.about || undefined,
+      email: user.email || undefined,
+      password: user.password || undefined, 
     }
-    update({ userId: this.match.params.userId }, { t: jwt.token }, user)
+    update({ userId: params.userId }, { t: jwt.token }, _user)
       .then(data => {
-        if(data.error) this.setState({ error: data.error })
-        else this.setState({ userId: data._id, redirectToProfile: true })
+        if(data.error) setRedirect({ ...redirect, error: data.error })
+        else setRedirect({ ...redirect, userId: data._id, redirectToProfile: true })
       })
   }
 
-  render() {
-    const {classes} = this.props
-    if (this.state.redirectToProfile) return (<Redirect to={'/user/' + this.state.userId}/>)
-    
-    return (
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography type="headline" component="h2" className={classes.title}>
-            Edit Profile
-          </Typography>
-          <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal"/><br/>
-          <TextField
-            id="multiline-flexible"
-            label="About"
-            multiline
-            rows="2"
-            value={this.state.about}
-            onChange={this.handleChange('about')}
-            className={classes.textField}
-            margin="normal"
-          /><br/>
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal"/><br/>
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal"/>
-          <br/> {
-            this.state.error && (<Typography component="p" color="error">
-              <Icon color="error" className={classes.error}>error</Icon>
-              {this.state.error}
-            </Typography>)
-          }
-        </CardContent>
-        <CardActions>
-          <Button color="primary" variant="contained" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
-        </CardActions>
-      </Card>
-    )
-  }
+  const {classes} = props
+  if (redirect.redirectToProfile) return (<Redirect to={'/user/' + redirect.userId}/>)
+  
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography type="headline" component="h2" className={classes.title}>
+          Edit Profile
+        </Typography>
+        <TextField id="name" label="Name" className={classes.textField} value={user.name} onChange={handleChange('name')} margin="normal"/><br/>
+        <TextField id="multiline-flexible" label="about" multiline rows="2" className={classes.textField} value={user.about} onChange={handleChange('about')} margin="normal"/><br/>
+        <TextField id="email" type="email" label="Email" className={classes.textField} value={user.email} onChange={handleChange('email')} margin="normal"/><br/>
+        <TextField id="password" type="password" label="Password" className={classes.textField} value={user.password} onChange={handleChange('password')} margin="normal"/>
+        <br/> {
+          redirect.error && (<Typography component="p" color="error">
+            <Icon color="error" className={classes.error}>error</Icon>
+            {redirect.error}
+          </Typography>)
+        }
+      </CardContent>
+      <CardActions>
+        <Button color="primary" variant="contained" onClick={clickSubmit} className={classes.submit}>Submit</Button>
+      </CardActions>
+    </Card>
+  )
 }
 
 EditProfile.propTypes = {

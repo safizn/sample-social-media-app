@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import { Redirect, Link } from 'react-router-dom'
@@ -7,50 +7,49 @@ import { Delete as DeleteIcon } from '@material-ui/icons'
 import auth from '../auth/auth-helper.js'
 import {remove} from './api-user.js'
 
-class DeleteUser extends Component { 
-  state = {
+const DeleteUser = (props) => {
+  const [redirectState, setRedirectState] = useState({ 
     redirect: false,
     open: false
-  }
-  clickButton = () => this.setState({open: true})
-  deleteAccount = () => {
+  })
+
+
+  const clickButton = () => setRedirectState({...redirectState, open: true})
+  const deleteAccount = () => {
     const jwt = auth.isAuthenticated()
-    remove({ userId: this.props.userId }, { t: jwt.token }).then(data => {
+    remove({ userId: props.userId }, { t: jwt.token }).then(data => {
       if (data.error) console.log(data.error)
       else {
         auth.signout(() => console.log('deleted'))
-        this.setState({ redirect: true })
+        setRedirectState({ ...redirectState, redirect: true })
       }
     })
   }
-  handleRequestClose = () => this.setState({open: false})
+  const handleRequestClose = () => setRedirectState({ ...redirectState, open: false})
 
-  render() {
-    const redirect = this.state.redirect
-    if (redirect) return <Redirect to='/'/>
-    return (<span>
-      <IconButton aria-label="Delete" onClick={this.clickButton} color="secondary">
-        <DeleteIcon/>
-      </IconButton>
+  if (redirectState.redirect) return <Redirect to='/'/>
+  return (<span>
+    <IconButton aria-label="Delete" onClick={clickButton} color="secondary">
+      <DeleteIcon/>
+    </IconButton>
 
-      <Dialog open={this.state.open} onClose={this.handleRequestClose}>
-        <DialogTitle>{"Delete Account"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Confirm to delete your account.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={this.handleRequestClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={this.deleteAccount} color="secondary" autoFocus="autoFocus">
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </span>)
-  }
+    <Dialog open={redirectState.open} onClose={handleRequestClose}>
+      <DialogTitle>{"Delete Account"}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Confirm to delete your account.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleRequestClose} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={deleteAccount} color="secondary" autoFocus="autoFocus">
+          Confirm
+        </Button>
+      </DialogActions>
+    </Dialog>
+  </span>)
 }
 
 DeleteUser.propTypes = {

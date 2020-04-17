@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useLocation } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
 import { Card, CardActions, CardContent, Icon, Button, TextField, Typography } from '@material-ui/core'
 import { signin } from './api-auth.js'
@@ -32,49 +32,49 @@ const styles = theme => ({
   }
 })
 
-class Signin extends Component {
-  state = { email: '', password: '', error: '', redirectToReferrer: false }
+const Signin = (props) => {
+  const location = useLocation()
+  const [user, setUser] = useState({ email: '', password: '' })
+  const [redirect, setRedirect] = useState({ error: '', redirectToReferrer: false })
 
-  handleChange = name => event => this.setState({ [name]: event.target.value })
+  const handleChange = name => event => setUser({ ...user, [name]: event.target.value })
 
-  clickSubmit = () => {
-    const user = { 
-      email: this.state.email || undefined,
-      password: this.state.password || undefined
+  const clickSubmit = () => {
+    const _user = { 
+      email: user.email || undefined,
+      password: user.password || undefined
     }
-    signin(user).then(data => {
-      if(data.error) this.setState({ error: data.error })
-      else auth.authenticate(data, () => this.setState({ redirectToReferrer: true }) )
+    signin(_user).then(data => {
+      if(data.error) setRedirect({ ...redirect, error: data.error })
+      else auth.authenticate(data, () => setRedirect({ ...redirect, redirectToReferrer: true }) )
     })
   }
 
-  render() {
-    const {classes} = this.props
-    const {from} = this.props.location.state || { from: { path: '/' }}
-    const {redirectToReferrer} = this.state
-    if(redirectToReferrer)
-      return (<Redirect to={from} />)
-    return (
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography type="headline" component="h2" className={classes.title}>
-            Sign In
-          </Typography>
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal"/><br/>
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal"/>
-          <br/> {
-            this.state.error && (<Typography component="p" color="error">
-              <Icon color="error" className={classes.error}>error</Icon>
-              {this.state.error}
-            </Typography>)
-          }
-        </CardContent>
-        <CardActions>
-          <Button color="primary" variant="contained" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
-        </CardActions>
-      </Card>
-    )
-  }
+  const {classes} = props
+  const {from} = location.state || { from: { path: '/' }}
+  const {redirectToReferrer} = redirect
+  if(redirectToReferrer)
+    return (<Redirect to={from} />)
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography type="headline" component="h2" className={classes.title}>
+          Sign In
+        </Typography>
+        <TextField id="email" type="email" label="Email" className={classes.textField} value={user.email} onChange={handleChange('email')} margin="normal"/><br/>
+        <TextField id="password" type="password" label="Password" className={classes.textField} value={user.password} onChange={handleChange('password')} margin="normal"/>
+        <br/> {
+          redirect.error && (<Typography component="p" color="error">
+            <Icon color="error" className={classes.error}>error</Icon>
+            {redirect.error}
+          </Typography>)
+        }
+      </CardContent>
+      <CardActions>
+        <Button color="primary" variant="contained" onClick={clickSubmit} className={classes.submit}>Submit</Button>
+      </CardActions>
+    </Card>
+  )
 }
 
 Signin.propTypes = {

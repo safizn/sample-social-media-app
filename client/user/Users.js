@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Paper, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton } from '@material-ui/core'
@@ -17,39 +17,37 @@ const styles = theme => ({
   }
 })
 
-class Users extends Component {
-  state = { users: [] }
+const Users = (props) => {
+  const [users, setUsers] = useState([])
 
-  async componentDidMount() {
-    await list().then(data => {
+  useEffect(()=> {
+    list().then(data => {
       if(data.error) console.log(error)
-      else this.setState({ users: data })
+      else setUsers(data)
     })
-  }
+  }, [])
 
-  render() {
-    const { classes } = this.props
-    return (
-      <Paper className={classes.root} elevation={4}>
-        <Typography type="title" className={classes.title}>All Users</Typography>
-        <List dense>
-          {
-            this.state.users.map((item, i)=> {              
-              return <Link to={`/user/${item._id}`} key={i}> 
-                <ListItem button>
-                  <ListItemAvatar><Avatar><Person/></Avatar></ListItemAvatar>
-                  <ListItemText primary={item.name}/>
-                  <ListItemSecondaryAction>
-                    <IconButton><ArrowForward/></IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              </Link>
-            })
-          }
-        </List>
-      </Paper>
-    )
-  } 
+  const { classes } = props
+  return (
+    <Paper className={classes.root} elevation={4}>
+      <Typography type="title" className={classes.title}>All Users</Typography>
+      <List dense>
+        {
+          users.map((item, i)=> {              
+            return <Link to={`/user/${item._id}`} key={i}> 
+              <ListItem button>
+                <ListItemAvatar><Avatar><Person/></Avatar></ListItemAvatar>
+                <ListItemText primary={item.name}/>
+                <ListItemSecondaryAction>
+                  <IconButton><ArrowForward/></IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            </Link>
+          })
+        }
+      </List>
+    </Paper>
+  )
 }
 
 Users.propTypes = {

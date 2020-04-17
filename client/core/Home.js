@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
@@ -20,23 +20,21 @@ const styles = theme => ({
   }
 })
 
-class Home extends Component {
-  render() {
-    const { classes } = this.props
-    return (
-      <div> 
-        <Card className={classes.card}>
-          <Typography type="headline" component="h2" className={classes.title}>Home Page</Typography>
-          <CardMedia className={classes.media} image={seashellImg} title="Unicorn Shells" /> 
-          <CardContent>
-            <Typography type="body1" component="p">
-              Welcome to the MERN Skeleton home page.
-            </Typography>
-          </CardContent>
-        </Card>
-      </div> 
-    )
-  }
+const Home = (props) => {
+  const { classes } = props
+  return (
+    <div> 
+      <Card className={classes.card}>
+        <Typography type="headline" component="h2" className={classes.title}>Home Page</Typography>
+        <CardMedia className={classes.media} image={seashellImg} title="Unicorn Shells" /> 
+        <CardContent>
+          <Typography type="body1" component="p">
+            Welcome to the MERN Skeleton home page.
+          </Typography>
+        </CardContent>
+      </Card>
+    </div> 
+  )
 }
 
 Home.propTypes = {

@@ -2,7 +2,7 @@ import React from 'react'
 import {Link, withRouter} from 'react-router-dom'
 import { AppBar, Toolbar, Typography, IconButton, Button } from '@material-ui/core'
 import { Home as HomeIcon } from '@material-ui/icons'
-import auth from './../auth/auth-helper'
+import auth from '../auth/auth-helper'
 
 const isActive = (history, path) => {
   if (history.location.pathname == path) return {color: '#ff4081'}

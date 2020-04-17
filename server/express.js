@@ -12,7 +12,7 @@ import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom'
 import { ServerStyleSheets, ThemeProvider } from '@material-ui/core/styles'
 import theme from '../client/theme.js'
-import MainRouter from './../client/MainRouter.js'
+import MainRouter from '../client/core/MainRouter.js'
 import template from "./template.js";
 
 import staticRoutes from './routes/static.routes.js'
