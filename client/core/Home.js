@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import seashellImg from '../assets/images/seashell.jpg'
 import FindPeople from '../user/FindPeople.js'
+import auth from '../auth/auth-helper.js'
 
 const styles = theme => ({
   card: {
@@ -22,6 +23,15 @@ const styles = theme => ({
 })
 
 const Home = (props) => {
+  const [flag, setFlag] = useState({ defaultPage: true })
+  
+  const init = () => {
+    if(auth.isAuthenticated()) setFlag({...flag, defaultPage: false})
+    else setFlag({...flag, defaultPage: true})
+  }
+  
+  useEffect(() => init(), [])
+  
   const { classes } = props
   return (
     <div> 
@@ -34,7 +44,8 @@ const Home = (props) => {
           </Typography>
         </CardContent>
       </Card>
-      <FindPeople/>
+      <br />
+      {!flag.defaultPage && <FindPeople/>}
     </div> 
   )
 }
