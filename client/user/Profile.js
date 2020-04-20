@@ -8,6 +8,7 @@ import { read } from "./api-user.js";
 import auth from '../auth/auth-helper.js'
 import DeleteUser from './DeleteUser.js'
 import FollowProfileButton from './FollowProfileButton.js'
+import FollowGrid from './FollowGrid.js'
 
 const styles = theme => ({
   root: theme.mixins.gutters({
@@ -98,6 +99,9 @@ const Profile = (props) => {
           <ListItemText primary={user.about} secondary={"Joined: " + (
             new Date(user.created)).toDateString()}/>
         </ListItem>
+        <Divider /> 
+        <FollowGrid people={user.following || []}/>
+        <FollowGrid people={user.followers || []}/>
       </List>
     </Paper>
   )

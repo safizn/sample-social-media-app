@@ -132,3 +132,15 @@ export const removeFollower = (req, res) => {
       res.status(400).json({ error: errorHandler.getErrorMessage(err) })
     })
 }
+
+export const findPeople = (req, res) => { 
+  let following = req.profile.following
+  following.push(req.profile._id)
+  User.find({ _id: { $nin: following }})
+    .select('name')
+    .then(users => res.json(users))
+    .catch(err => {
+      console.log(err)
+      res.status(400).json({ error: errorHandler.getErrorMessage(err) })
+    })
+}

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import seashellImg from '../assets/images/seashell.jpg'
+import FindPeople from '../user/FindPeople.js'
 
 const styles = theme => ({
   card: {
@@ -33,6 +34,7 @@ const Home = (props) => {
           </Typography>
         </CardContent>
       </Card>
+      <FindPeople/>
     </div> 
   )
 }
