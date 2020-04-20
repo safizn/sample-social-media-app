@@ -51,3 +51,27 @@ export const remove = (params, credentials) => fetch(`/api/users/${params.userId
   .then(response => response.json())
   .catch(err => console.log(err))
 
+export const follow = (params, credentials, followId) => {
+  return fetch('/api/users/follow/', {
+    method: 'PUT', 
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + credentials.t
+    },
+    body: JSON.stringify({ userId: params.userId, followId })
+  })
+  .then(response => response.json())
+  .catch(err => console.log(err))}
+
+export const unfollow = (params, credentials, unfollowId) => fetch('/api/users/unfollow/', {
+    method: 'PUT', 
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + credentials.t
+    },
+    body: JSON.stringify({ userId: params.userId, unfollowId })
+  })
+  .then(response => response.json())
+  .catch(err => console.log(err))

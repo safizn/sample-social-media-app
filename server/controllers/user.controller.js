@@ -22,6 +22,8 @@ export const list = async (req, res) => {
 
 export const userByID = async (req, res, next, id) => {
   await User.findById(id)
+    .populate('following', '_id name')
+    .populate('followers', '_id name')
     .then(user => {
       if(!user) return res.status(400).json({ error: 'User not found' })
       req.profile = user
@@ -81,4 +83,52 @@ export const photo = (req, res, next) => {
 import profileImage from '../../client/assets/images/profile-pic.png'
 export const defaultPhoto = (req, res) => {
   return res.sendFile(process.cwd() + profileImage /** e.g. "/dist/<hash>.png" */)
+}
+
+export const addFollowing = (req, res, next) => {
+  User.findByIdAndUpdate(req.body.userId, { $push: { following: req.body.followId }})
+    .catch(err => {
+      console.log(err)
+      res.status(400).json({ error: errorHandler.getErrorMessage(err) })
+    })
+  next()
+}
+
+export const addFollower = (req, res) => {
+  User.findByIdAndUpdate(req.body.followId, { $push: { followers: req.body.userId }}, {new:true})
+    .populate('following', '_id name')
+    .populate('followers', '_id name')
+    .then(result => {
+      result.hashed_password = undefined
+      result.salt = undefined
+      res.json(result)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(400).json({ error: errorHandler.getErrorMessage(err) })
+    })
+}
+
+export const removeFollowing = (req, res, next) => {
+  User.findByIdAndUpdate(req.body.userId, { $pull: { following: req.body.unfollowId }})
+    .then(result => { next() })
+    .catch(err => {
+      console.log(err)
+      res.status(400).json({ error: errorHandler.getErrorMessage(err) })
+    })
+}
+
+export const removeFollower = (req, res) => {
+  User.findByIdAndUpdate(req.body.unfollowId, {$pull: { followers: req.body.userId }}, {new: true})
+    .populate('following', '_id name')
+    .populate('followers', '_id name')
+    .then(result => {
+      result.hashed_password = undefined
+      result.salt = undefined
+      res.json(result)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(400).json({ error: errorHandler.getErrorMessage(err) })
+    })
 }

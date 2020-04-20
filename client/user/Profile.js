@@ -7,6 +7,7 @@ import { Edit, Person } from '@material-ui/icons'
 import { read } from "./api-user.js";
 import auth from '../auth/auth-helper.js'
 import DeleteUser from './DeleteUser.js'
+import FollowProfileButton from './FollowProfileButton.js'
 
 const styles = theme => ({
   root: theme.mixins.gutters({
@@ -24,14 +25,40 @@ const styles = theme => ({
 const Profile = (props) => { 
   const { userId } = useParams()
   const [user, setUser] = useState({})
+  const [flag, setFlag] = useState({ following: false })
   const [ redirectToSignin, set_redirectToSignin] = useState(false)
+
+  useEffect(() => {
+    if(flag.error) console.log(flag.error)
+  }, [flag])
+
+  const clickFollowButton = (callApi) => {
+    const jwt = auth.isAuthenticated()
+    callApi({ userId: jwt.user._id}, { t: jwt.token }, user._id)
+      .then(data => {
+        if(data.error) throw new Error(data.error)
+        setUser(data)
+        setFlag({...flag, following: !flag.following }) // toggle
+      })
+      .catch(err => setFlag({...flag, error: err}))
+  }
+
+  const checkFollow = (user) => {
+    const jwt = auth.isAuthenticated() 
+    const match = user.followers.find(follower => follower._id == jwt.user._id)
+    return Boolean(match)
+  }
 
   const init = (userId) => {
     const jwt = auth.isAuthenticated() 
     read({ userId }, { t: jwt.token})
       .then(data => {
         if(data.error) set_redirectToSignin(true)
-        else setUser(data)
+        else {
+          setUser(data)
+          let following = checkFollow(data)
+          setFlag({ ...flag, following })
+        }
       })
   }
 
@@ -54,15 +81,16 @@ const Profile = (props) => {
             <Avatar src={photoUrl} className={classes.bigAvatar}/>
           </ListItemAvatar>
           <ListItemText primary={user.name} secondary={user.email}/> {
-            auth.isAuthenticated().user && auth.isAuthenticated().user._id == user._id && 
-            (<ListItemSecondaryAction>
-              <Link to={"/user/edit/" + user._id}>
-                <IconButton aria-label="Edit" color="primary">
-                  <Edit/>
-                </IconButton>
-              </Link>
-              <DeleteUser userId={user._id}/>
-            </ListItemSecondaryAction>)
+            (auth.isAuthenticated().user && auth.isAuthenticated().user._id == user._id) 
+              ? (<ListItemSecondaryAction>
+                  <Link to={"/user/edit/" + user._id}>
+                    <IconButton aria-label="Edit" color="primary">
+                      <Edit/>
+                    </IconButton>
+                  </Link>
+                  <DeleteUser userId={user._id}/>
+                </ListItemSecondaryAction>)
+              : <FollowProfileButton following={flag.following || false} onButtonClick={clickFollowButton} />
           }
         </ListItem>
         <Divider/>
