@@ -18,6 +18,7 @@ import template from "./template.js";
 import staticRoutes from './routes/static.routes.js'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import postRoutes from './routes/post.routes.js'
 
 const app = express() 
 
@@ -40,6 +41,7 @@ app.use('/', staticRoutes)
 
 app.use('/', userRoutes)
 app.use('/', authRoutes)
+app.use('/', postRoutes)
 
 /** server-side render */
 app.get('*', (req, res) => {
@@ -47,9 +49,7 @@ app.get('*', (req, res) => {
   const context = {}
   const html = renderToString(sheets.collect(
     <StaticRouter location={req.url} context={context}>
-      <ThemeProvider theme={theme}>
-        <MainRouter/>
-      </ThemeProvider>
+      <ThemeProvider theme={theme}><MainRouter/></ThemeProvider>
     </StaticRouter>
   ))
   if (context.url) return res.redirect(303, context.url)

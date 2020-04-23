@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
+import { Card, CardContent, CardMedia, Typography, Grid } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import seashellImg from '../assets/images/seashell.jpg'
-import FindPeople from '../user/FindPeople.js'
 import auth from '../auth/auth-helper.js'
+import FindPeople from '../user/FindPeople.js'
+import Newsfeed from './../post/Newsfeed'
 
 const styles = theme => ({
   card: {
@@ -32,21 +33,37 @@ const Home = (props) => {
   
   useEffect(() => init(), [])
   
-  const { classes } = props
+  const {classes} = props
   return (
-    <div> 
-      <Card className={classes.card}>
-        <Typography type="headline" component="h2" className={classes.title}>Home Page</Typography>
-        <CardMedia className={classes.media} image={seashellImg} title="Unicorn Shells" /> 
-        <CardContent>
-          <Typography type="body1" component="p">
-            Welcome to the MERN Skeleton home page.
-          </Typography>
-        </CardContent>
-      </Card>
-      <br />
-      {!flag.defaultPage && <FindPeople/>}
-    </div> 
+    <div className={classes.root}>
+      {flag.defaultPage &&
+        <Grid container spacing={10}>
+          <Grid item xs={9}>
+            <Card className={classes.card}>
+              <Typography type="headline" component="h2" className={classes.title}>
+                Home Page
+              </Typography>
+              <CardMedia className={classes.media} image={seashellImg} title="Unicorn Shells"/>
+              <CardContent>
+                <Typography type="body1" component="p">
+                  Welcome to the MERN Social home page. 
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      }
+      {!flag.defaultPage &&
+        <Grid container spacing={10}>
+          <Grid item xs={8} sm={7}>
+            <Newsfeed/>
+          </Grid>
+          <Grid item xs={6} sm={5}>
+            <FindPeople/>
+          </Grid>
+        </Grid>
+      }
+    </div>
   )
 }
 

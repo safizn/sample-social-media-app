@@ -1,5 +1,5 @@
 import { createMuiTheme } from '@material-ui/core/styles'
-import { indigo, pink } from '@material-ui/core/colors'
+import { indigo, pink, orange, teal } from '@material-ui/core/colors'
 
 const theme = createMuiTheme({
   palette: {
